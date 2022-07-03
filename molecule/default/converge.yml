@@ -19,9 +19,17 @@
     #   failed_when: systemctl_status.rc > 1
 
   tasks:
-    - apt:
-        name: curl
+    - name: ensure req packages are present
+      apt:
+        name:
+          - curl
         state: present
+
+    - name: workaround to ensure ca-certificates is most recent version
+      apt:
+        name:
+          - ca-certificates
+        state: absent
 
     - name: "Include Syncthing Role"
       include_role:
