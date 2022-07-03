@@ -1,0 +1,38 @@
+---
+- name: ensure packages exist to allow apt to use HTTPS for repositories
+  apt:
+    name: "{{ syncthing_apt_req_packages }}"
+    state: present
+  become: true
+
+- name: Add Syncthing apt gpg key
+  shell: >
+    curl -s -o {{ syncthing_apt_gpg_key }} {{ syncthing_apt_gpg_key_source }}
+  args:
+    warn: false
+  changed_when: false
+  become: true
+
+- name: Add the "stable" channel to your APT sources
+  shell: >
+    echo "deb [signed-by={{ syncthing_apt_gpg_key }}] https://apt.syncthing.net/ syncthing stable" | sudo tee /etc/apt/sources.list.d/syncthing.list
+  changed_when: false
+  when: syncthing_channel == "stable"
+
+- name: Add the "candidate" channel to your APT sources
+  shell: >
+    echo "deb [signed-by={{ syncthing_apt_gpg_key }}] https://apt.syncthing.net/ syncthing candidate" | sudo tee /etc/apt/sources.list.d/syncthing.list
+  changed_when: false
+  when: syncthing_channel == "candidate"
+
+- name: Increase preference of Syncthing's packages ("pinning")
+  shell: >
+    printf "Package: *\nPin: origin apt.syncthing.net\nPin-Priority: 990\n" | sudo tee /etc/apt/preferences.d/syncthing
+  changed_when: false
+
+- name: ensure syncthing is installed
+  apt:
+    name: "{{ syncthing_package_name }}"
+    state: present
+    update_cache: true
+  become: true

@@ -1,0 +1,13 @@
+---
+# 'install', 'remove' or 'ignore'
+network_manager: "ignore"
+
+syncthing_package_name: syncthing
+syncthing_apt_req_packages:
+  - apt-transport-https
+  - ca-certificates
+
+syncthing_apt_gpg_key: /usr/share/keyrings/syncthing-archive-keyring.gpg
+syncthing_apt_gpg_key_source: https://syncthing.net/release-key.gpg
+
+syncthing_channel: stable
